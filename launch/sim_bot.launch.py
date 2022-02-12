@@ -1,10 +1,10 @@
 # Inspired by: https://automaticaddison.com/how-to-load-a-urdf-file-into-gazebo-ros-2/
+import os
 from ament_index_python.packages import get_package_share_path
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 
-import os
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration, PythonExpression
@@ -22,10 +22,28 @@ def generate_launch_description():
     # Pose where we want to spawn the robot
     spawn_x_val = "0.0"
     spawn_y_val = "0.0"
-    spawn_z_val = "0.2"
+    spawn_z_val = "0.5"
     spawn_yaw_val = "0.00"
 
     # Declare the launch arguments
+    gui_arg = DeclareLaunchArgument(
+        name="gui",
+        default_value="true",
+        description="Set to false to run headless.",
+    )
+
+    server_arg = DeclareLaunchArgument(
+        name="server",
+        default_value="true",
+        description="Set to false not to run gzserver.",
+    )
+
+    world_arg = DeclareLaunchArgument(
+        name="world",
+        default_value=str(world_path),
+        description="Full path to the world model file to load",
+    )
+
     # namespace_arg = DeclareLaunchArgument(
     #     name="namespace", default_value="", description="Top-level namespace"
     # )
@@ -54,47 +72,33 @@ def generate_launch_description():
     #     description="Use simulation (Gazebo) clock if true",
     # )
 
-    world_arg = DeclareLaunchArgument(
-        name="world",
-        default_value=str(world_path),
-        description="Full path to the world model file to load",
-    )
-
     # Launch urdf and rviz
     launch_rviz = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(str(urdf_package_path), "launch", "view_bot.launch.py")
+            str(urdf_package_path / "launch/view_bot.launch.py")
         ),
     )
 
-    # # Start Gazebo server
-    # launch_gazebo_server = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(str(gazebo_package_path), "launch", "gzserver.launch.py")
-    #     ),
-    #     # condition=IfCondition(LaunchConfiguration("use_simulator")),
-    #     launch_arguments={"world": LaunchConfiguration("world")}.items(),
-    # )
+    # Start Gazebo server
+    launch_gazebo_server = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            str(gazebo_package_path / "launch/gzserver.launch.py")
+        ),
+        condition=IfCondition(LaunchConfiguration("server")),
+        launch_arguments={"world": LaunchConfiguration("world")}.items(),
+    )
 
-    # # Start Gazebo client
-    # launch_gazebo_client = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(str(gazebo_package_path), "launch", "gzclient.launch.py")
-    #     ),
-    #     # condition=IfCondition(
-    #     #     PythonExpression(
-    #     #         [
-    #     #             LaunchConfiguration("use_simulator"),
-    #     #             " and not ",
-    #     #             LaunchConfiguration("headless"),
-    #     #         ]
-    #     #     )
-    #     # ),
-    # )
+    # Start Gazebo client
+    launch_gazezbo_client = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            str(gazebo_package_path / "launch/gzclient.launch.py")
+        ),
+        condition=IfCondition(LaunchConfiguration("gui")),
+    )
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(str(gazebo_package_path), "launch", "gazebo.launch.py")
+            str(gazebo_package_path / "launch/gazebo.launch.py"),
         )
     )
 
@@ -126,10 +130,12 @@ def generate_launch_description():
             # use_namespace_arg,
             # simulator_arg,
             # sim_time_arg,
+            gui_arg,
+            server_arg,
             world_arg,
             launch_rviz,
             # launch_gazebo_server,
-            # launch_gazebo_client,
+            # launch_gazezbo_client,
             gazebo,
             spawn_entity,
         ]
