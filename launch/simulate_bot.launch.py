@@ -15,7 +15,7 @@ def generate_launch_description():
     gazebo_package_path = get_package_share_path("gazebo_demo")
     default_model_path = urdf_package_path / "urdf/bot.urdf.xacro"
     default_rviz_config_path = urdf_package_path / "rviz/bot.rviz"
-    world_path = gazebo_package_path / "worlds/test_world2.sdf"
+    world_path = gazebo_package_path / "worlds/demo_world.sdf"
 
     gui_arg = DeclareLaunchArgument(
         name="gui",
@@ -76,9 +76,9 @@ def generate_launch_description():
             "-topic",
             "robot_description",
             "-x",
-            "1.0",
+            "0.0",
             "-y",
-            "2.0",
+            "0.0",
             "-z",
             "0.5",
         ],
