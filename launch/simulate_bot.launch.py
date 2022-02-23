@@ -15,7 +15,7 @@ def generate_launch_description():
     gazebo_package_path = get_package_share_path("gazebo_demo")
     default_model_path = urdf_package_path / "urdf/bot.urdf.xacro"
     default_rviz_config_path = urdf_package_path / "rviz/bot.rviz"
-    world_path = gazebo_package_path / "worlds/test_world.sdf"
+    world_path = gazebo_package_path / "worlds/test_world2.sdf"
 
     gui_arg = DeclareLaunchArgument(
         name="gui",
@@ -70,7 +70,18 @@ def generate_launch_description():
     spawn_entity = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
-        arguments=["-entity", "bot", "-topic", "robot_description", "-x", "1.0", "-y", "2.0", "-z", '0.5'],
+        arguments=[
+            "-entity",
+            "bot",
+            "-topic",
+            "robot_description",
+            "-x",
+            "1.0",
+            "-y",
+            "2.0",
+            "-z",
+            "0.5",
+        ],
         output="screen",
     )
 
@@ -80,6 +91,7 @@ def generate_launch_description():
             sim_time_arg,
             model_arg,
             rviz_arg,
+            joint_state_publisher_node,
             ExecuteProcess(
                 cmd=[
                     "gazebo",
@@ -92,9 +104,8 @@ def generate_launch_description():
                 ],
                 output="screen",
             ),
-            joint_state_publisher_node,
-            robot_state_publisher_node,
             spawn_entity,
+            robot_state_publisher_node,
             rviz_node,
         ]
     )
