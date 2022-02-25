@@ -91,7 +91,6 @@ def generate_launch_description():
             sim_time_arg,
             model_arg,
             rviz_arg,
-            joint_state_publisher_node,
             ExecuteProcess(
                 cmd=[
                     "gazebo",
@@ -104,8 +103,9 @@ def generate_launch_description():
                 ],
                 output="screen",
             ),
-            spawn_entity,
+            joint_state_publisher_node,
             robot_state_publisher_node,
+            spawn_entity,
             rviz_node,
         ]
     )
