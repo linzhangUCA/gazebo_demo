@@ -67,6 +67,18 @@ def generate_launch_description():
         output="screen",
         arguments=["-d", LaunchConfiguration("rvizconfig")],
     )
+    gazebo_process = ExecuteProcess(
+        cmd=[
+            "gazebo",
+            "--verbose",
+            "-s",
+            "libgazebo_ros_init.so",
+            "-s",
+            "libgazebo_ros_factory.so",
+            str(world_path),
+        ],
+        output="screen",
+    )
     spawn_entity = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
@@ -91,21 +103,10 @@ def generate_launch_description():
             sim_time_arg,
             model_arg,
             rviz_arg,
-            ExecuteProcess(
-                cmd=[
-                    "gazebo",
-                    "--verbose",
-                    "-s",
-                    "libgazebo_ros_init.so",
-                    "-s",
-                    "libgazebo_ros_factory.so",
-                    str(world_path),
-                ],
-                output="screen",
-            ),
             joint_state_publisher_node,
-            robot_state_publisher_node,
+            gazebo_process,
             spawn_entity,
+            robot_state_publisher_node,
             rviz_node,
         ]
     )
