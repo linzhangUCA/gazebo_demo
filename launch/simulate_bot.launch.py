@@ -16,6 +16,7 @@ def generate_launch_description():
     default_model_path = urdf_package_path / "urdf/bot.urdf.xacro"
     default_rviz_config_path = urdf_package_path / "rviz/bot.rviz"
     world_path = gazebo_package_path / "worlds/demo_world.sdf"
+    # sdnaskjdsadfasf
 
     gui_arg = DeclareLaunchArgument(
         name="gui",
